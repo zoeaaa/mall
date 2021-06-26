@@ -1,11 +1,18 @@
 <template>
   <div id="home">
     <nav-bar class="home-nav"><div slot="center">购物街</div></nav-bar>
-    <home-swiper :banners="banners"/>
-    <recommend-view :recommends="recommends"/>
-    <feature-view/>
-    <tab-control class="tab-control" :titles="['流行','新款','精选']"/>
-    <goods-list :goods="goods['pop'].list"/>
+
+    <scroll class="content" ref="scroll" :probe-type="3">
+      <home-swiper :banners="banners"/>
+      <recommend-view :recommends="recommends"/>
+      <feature-view/>
+      <tab-control class="tab-control"
+                    :titles="['流行','新款','精选']"
+                    @tabClick="tabClick"/>
+      <goods-list :goods="showGoods"/>
+    </scroll>
+
+    <back-top @click.native="backClick"></back-top>
 
     <ul>
       <li></li>
@@ -70,6 +77,8 @@
 
   import TabControl from '../../components/content/tabControl/TabControl.vue'
   import GoodsList from '../../components/content/goods/GoodsList.vue'
+  import Scroll from '../../components/common/scroll/Scroll.vue'
+  import BackTop from '../../components/content/backTop/BackTop.vue'
 
   import {getHomeMultidata, getHomeGoods} from 'network/home'
 
@@ -80,7 +89,9 @@
       RecommendView,
       TabControl,
       FeatureView,
-      GoodsList
+      GoodsList,
+      Scroll,
+      BackTop
     },
     data() {
       return {
@@ -92,7 +103,13 @@
           'pop': {page: 0, list: []},
           'new': {page: 0, list: []},
           'sell': {page: 0, list: []},
-        }
+        },
+        currentType: 'pop'
+      }
+    },
+    computed: {
+      showGoods() {
+        return this.goods[this.currentType].list
       }
     },
     created() {
@@ -105,6 +122,30 @@
       this.getHomeGoods('sell')
     },
     methods: {
+      /**
+       * 事件监听的方法
+       */
+      tabClick(index){
+        switch(index) {
+          case 0:
+            this.currentType = 'pop'
+            break
+          case 1:
+            this.currentType = 'new'
+            break
+          case 2:
+            this.currentType = 'sell'
+            break
+        }
+      },
+
+      backClick(){
+        this.$refs.scroll.scrollTo(0,0)
+      },
+
+      /**
+       * 网络请求相关的方法
+       */
       getHomeMultidata() {
         getHomeMultidata().then(res => {
           // console.log(res);
@@ -125,9 +166,11 @@
   }
 </script>
 
-<style>
+<style scoped>
   #home {
     padding-top: 44px;
+    height: 100vh;
+    position: relative;
   }
 
   .home-nav{
@@ -145,7 +188,18 @@
     /* sticky: 到达固定位置就黏住不懂 */
     position: sticky;
     top: 44px;
-    z-index: 9px;
+    z-index: 9;
+  }
+
+  .content {
+    /* height: 300px; */
+    overflow: hidden;
+
+    position: absolute;
+    top: 44px;
+    bottom: 49px;
+    left: 0;
+    right: 0;
   }
 
 </style>

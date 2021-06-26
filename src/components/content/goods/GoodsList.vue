@@ -1,7 +1,9 @@
 <template>
   <div class="goods">
-    <goods-list-item v-for="item in goods" :goods-item="item"/>
-    {{goods}}
+    <goods-list-item
+      v-for="item in goods"
+      :goods-item="item" class="item">
+    </goods-list-item>
   </div>
 </template>
 
@@ -31,5 +33,9 @@
     justify-content: space-around;
 
     padding: 2px;
+  }
+
+  .goods .item {
+    width: 48%;
   }
 </style>

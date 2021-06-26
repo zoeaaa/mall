@@ -28,10 +28,10 @@
     /* 子绝父相 */
     position: relative;
 
-    width: 48%;
   }
 
   .goods-item img {
+    height: 100%;
     width: 100%;
     border-radius: 5px;
   }

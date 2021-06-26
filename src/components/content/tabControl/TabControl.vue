@@ -26,6 +26,8 @@
     methods: {
       itemClick(index) {
         this.currentIndex = index;
+        // 外面往里面传数据用props，内部往外面传（子传父）用$emit
+        this.$emit('tabClick',index)
       }
     },
   }
