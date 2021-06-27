@@ -2,7 +2,11 @@
   <div id="home">
     <nav-bar class="home-nav"><div slot="center">购物街</div></nav-bar>
 
-    <scroll class="content" ref="scroll" :probe-type="3">
+    <scroll class="content"
+            ref="scroll"
+            :probe-type="3"
+            @scroll="contentScroll"
+            :pull-up-load="true">
       <home-swiper :banners="banners"/>
       <recommend-view :recommends="recommends"/>
       <feature-view/>
@@ -12,7 +16,7 @@
       <goods-list :goods="showGoods"/>
     </scroll>
 
-    <back-top @click.native="backClick"></back-top>
+    <back-top @click.native="backClick" v-show="isShowBackTop"></back-top>
 
     <ul>
       <li></li>
@@ -104,7 +108,8 @@
           'new': {page: 0, list: []},
           'sell': {page: 0, list: []},
         },
-        currentType: 'pop'
+        currentType: 'pop',
+        isShowBackTop: false
       }
     },
     computed: {
@@ -121,6 +126,15 @@
       this.getHomeGoods('new')
       this.getHomeGoods('sell')
     },
+    mounted() {
+      //3.监听item中图片加载完成
+      this.$bus.$on('itemImageLoad', () => {
+        this.$refs.scroll.refresh()
+        console.log('-------');
+      })
+    },
+
+
     methods: {
       /**
        * 事件监听的方法
@@ -141,6 +155,11 @@
 
       backClick(){
         this.$refs.scroll.scrollTo(0,0)
+      },
+
+      contentScroll(position) {
+        this.isShowBackTop = (-position.y) > 1000
+        // console.log(position);
       },
 
       /**
@@ -185,7 +204,7 @@
   }
 
   .tab-control {
-    /* sticky: 到达固定位置就黏住不懂 */
+    /* sticky: 到达固定位置就黏住不动 */
     position: sticky;
     top: 44px;
     z-index: 9;
