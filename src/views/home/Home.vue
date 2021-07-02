@@ -186,6 +186,8 @@
             this.currentType = 'sell'
             break
         }
+
+        // 让两个TabContol的currentIndex保持一致
         this.$refs.tabControl1.currentIndex = index;
         this.$refs.tabControl2.currentIndex = index;
       },
