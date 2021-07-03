@@ -1,7 +1,10 @@
 <template>
   <div id="detail">
-    <detail-nav-bar @titleClick="selectIndex" class="detail-nav"/>
-    <scroll class="content1" ref="scroll">
+    <detail-nav-bar @titleClick="selectIndex" class="detail-nav" ref="nav"/>
+    <scroll class="content1"
+            ref="scroll"
+            :probe-type="3"
+            @scroll="contentScroll">
       <!-- 只能看到一张图片且不轮播，解决方法：v-if="topImages!=''" -->
       <detail-swiper v-if="topImages!=''" :top-images="topImages"/>
       <detail-base-info :goods="goods"/>
@@ -11,6 +14,8 @@
       <detail-comment-info ref="comment" :comment-info="commentInfo"/>
       <goods-list ref="recommend" :goods="recommends"/>
     </scroll>
+    <back-top v-show="showBackTop" @click.native="backTop"/>
+    <detail-bottom-bar @addToCart="addToCart"/>
   </div>
 </template>
 
@@ -22,9 +27,13 @@
   import DetailGoodsInfo from './childComps/DetailGoodsInfo.vue'
   import DetailParamInfo from './childComps/DetailParamInfo.vue'
   import DetailCommentInfo from './childComps/DetailCommentInfo.vue'
+  import DetailBottomBar from './childComps/DetailBottomBar.vue'
 
   import Scroll from '../../components/common/scroll/Scroll.vue'
+
   import GoodsList from '../../components/content/goods/GoodsList.vue'
+
+  import {backTopMixin} from "common/mixin"
 
   import {getDetail,Goods,Shop,GoodsParam,getRecommend} from "network/detail"
 
@@ -39,8 +48,10 @@
       DetailParamInfo,
       DetailCommentInfo,
       Scroll,
-      GoodsList
+      GoodsList,
+      DetailBottomBar
     },
+    mixins: [backTopMixin],
     data() {
       return {
         iid: null,
@@ -52,7 +63,8 @@
         commentInfo: {},
         recommends: [],
         themeTopYs: [],
-        getThemeTopY: null
+        getThemeTopY: null,
+        currentIndex: 0
       }
     },
     created() {
@@ -140,13 +152,58 @@
         this.themeTopYs.push(this.$refs.params.$el.offsetTop)
         this.themeTopYs.push(this.$refs.comment.$el.offsetTop)
         this.themeTopYs.push(this.$refs.recommend.$el.offsetTop)
+        this.themeTopYs.push(Number.MAX_VALUE)
 
         console.log(this.themeTopYs);
       },
+
       selectIndex(index) {
         //console.log(index);
         this.$refs.scroll.scrollTo(0, -this.themeTopYs[index], 500)
+      },
+
+      contentScroll(position){
+        // 内容滚动，显示正确的标题
+        // 1.获取y值
+        const positionY = -position.y;
+
+        let length = this.themeTopYs.length
+        for (let i = 0; i < length; i++) {
+          // 2.positionY和主题中值进行对比
+          // [0, 13429, 14111, 14402]
+          // positionY 在 0 和 13429 之间， index = 0
+          // positionY 在 13429 和 14111 之间， index = 1
+          // positionY 在 14111 和  14402 之间， index = 2
+
+          // positionY 超过 14402 ， index = 3
+
+          // if(this.currentIndex !== i && ((i < length - 1 && positionY >= this.themeTopYs[i] && positionY <
+          // this.themeTopYs[i+1]) || (i === length - 1 && positionY >= this.themeTopYs[i]))){
+          //   this.currentIndex = i;
+          //   // console.log(this.currentIndex);
+          //   this.$refs.nav.currentIndex = this.currentIndex
+          // }
+
+          // [0, 13429, 14111, 14402]
+          // positionY 在 0 和 13429 之间， index = 0
+          // positionY 在 13429 和 14111 之间， index = 1
+          // positionY 在 14111 和  14402 之间， index = 2
+          // positionY 在 14402 和一个非常大的数之间， index = 2
+
+          if(this.currentIndex !== i && (positionY >= this.themeTopYs[i] && positionY < this.themeTopYs[i+1])){
+            this.currentIndex = i;
+            this.$refs.nav.currentIndex = this.currentIndex
+          }
+        }
+
+        // 决定backTop按钮是否实现
+        this.showBackTop = position.y <= -1000
+      },
+
+      addToCart() {
+        console.log('----');
       }
+
     },
   }
 </script>
@@ -154,7 +211,7 @@
 <style>
   #detail {
     position: relative;
-    z-index: 9;
+    z-index: 1;
     background-color: #fff;
     height: 100vh;
   }
@@ -166,6 +223,7 @@
   }
 
   .content1 {
-    height: calc(100% - 44px);
+    background-color: #fff;
+    height: calc(100% - 44px - 49px);
   }
 </style>

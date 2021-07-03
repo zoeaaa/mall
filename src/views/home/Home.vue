@@ -89,7 +89,8 @@
   import TabControl from '../../components/content/tabControl/TabControl.vue'
   import GoodsList from '../../components/content/goods/GoodsList.vue'
   import Scroll from '../../components/common/scroll/Scroll.vue'
-  import BackTop from '../../components/content/backTop/BackTop.vue'
+
+  import {backTopMixin} from "common/mixin";
 
   import {getHomeMultidata, getHomeGoods} from 'network/home'
 
@@ -102,8 +103,8 @@
       FeatureView,
       GoodsList,
       Scroll,
-      BackTop
     },
+    mixins: [backTopMixin],
     data() {
       return {
         // result保存created中的res（created调用完后垃圾回收会销毁res）
