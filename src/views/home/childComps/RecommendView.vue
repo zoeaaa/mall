@@ -23,7 +23,7 @@
 </script>
 
 <style>
-  .recommend {
+  /* .recommend {
     display: flex;
     width: 100%;
     text-align: center;
@@ -41,6 +41,23 @@
     height: 70px;
     width: 70px;
     margin-bottom: 10px;
+  } */
+  .recommend {
+    display: flex;
+    margin-top: 10px;
+    font-size: 14px;
+    padding-bottom: 30px;
+    border-bottom: 10px solid #eee;
   }
 
+  .recommend-item {
+    flex: 1;
+    text-align: center;
+  }
+
+  .recommend img {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 10px;
+  }
 </style>

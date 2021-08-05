@@ -6,6 +6,8 @@
             :probe-type="3"
             @scroll="contentScroll">
       <!-- 只能看到一张图片且不轮播，解决方法：v-if="topImages!=''" -->
+      <!-- 属性：topImages  传入值：top-images -->
+
       <detail-swiper v-if="topImages!=''" :top-images="topImages"/>
       <detail-base-info :goods="goods"/>
       <detail-shop-info :shop="shop"/>
@@ -16,6 +18,7 @@
     </scroll>
     <back-top v-show="showBackTop" @click.native="backTop"/>
     <detail-bottom-bar @addToCart="addToCart"/>
+    <toast :message="message" :show="show"/>
   </div>
 </template>
 
@@ -32,6 +35,8 @@
   import Scroll from '../../components/common/scroll/Scroll.vue'
 
   import GoodsList from '../../components/content/goods/GoodsList.vue'
+  import Toast from '../../components/common/toast/Toast.vue'
+
 
   import {backTopMixin} from "common/mixin"
 
@@ -49,7 +54,8 @@
       DetailCommentInfo,
       Scroll,
       GoodsList,
-      DetailBottomBar
+      DetailBottomBar,
+      Toast
     },
     mixins: [backTopMixin],
     data() {
@@ -64,7 +70,9 @@
         recommends: [],
         themeTopYs: [],
         getThemeTopY: null,
-        currentIndex: 0
+        currentIndex: 0,
+        message: '',
+        show: false
       }
     },
     created() {
@@ -201,7 +209,25 @@
       },
 
       addToCart() {
-        console.log('----');
+        // 1.获取购物车需要显示的信息
+        const product = {}
+        product.image = this.topImages[0];
+        product.title = this.goods.title;
+        product.desc = this.goods.desc;
+        product.price = this.goods.realPrice;
+        product.iid = this.iid;
+
+        // 2.将商品添加到购物车里
+        // this.$store.commit('addCart',product)
+        this.$store.dispatch('addCart',product).then(res => {
+          this.show = true;
+          this.message = res;
+          setTimeout(() => {
+            this.show = false;
+            this.message = ''
+          },1500)
+          // console.log(res);
+        })
       }
 
     },

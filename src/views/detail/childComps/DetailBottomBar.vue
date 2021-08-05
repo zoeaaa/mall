@@ -43,11 +43,15 @@
 <style scoped>
   .bottom-bar {
     height: 58px;
-    position: fixed;
+    /* 点击加入购物车把数据渲染到detail轮播图上面，
+    然后下面的bottombar给顶到下面看不见了,将position的fixed改为relative */
+    /* position: fixed; */
+    position: relative;
     background-color: #fff;
     left: 0;
     right: 0;
     bottom: 0;
+    overflow: hidden;
 
     display: flex;
     text-align: center;
